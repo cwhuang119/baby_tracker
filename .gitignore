@@ -1,0 +1,7 @@
+*.sqlite3
+*.log
+*.pyc
+app/*/migrations/*
+env.py
+app/baby/migrations/0001_initial.py
+cmd.txt

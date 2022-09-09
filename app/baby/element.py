@@ -23,20 +23,47 @@ menu_btn = TemplateSendMessage(
                 data='A&登記'
             ),
             PostbackTemplateAction(
-                label="查詢詳細紀錄",
-                text="Menu!Query_Type_ALL",
-                data="A&查詢詳細紀錄"
+                label='補登',
+                text='Menu!Log_History',
+                data='A&補登'
             ),
             PostbackTemplateAction(
-                label="查詢統計紀錄",
-                text="Menu!Query_Type_SUM",
-                data="A&查詢統計紀錄"
+                label="查詢",
+                text="Menu!Query",
+                data="A&查詢"
             ),
             PostbackTemplateAction(
                 label="提醒設定",
                 text="Menu!Reimder_Type",
                 data="A&提醒設定"
             )
+        ]
+    )
+)
+
+
+
+query_btn = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        title='查詢項目',
+        text='請選擇',
+        actions=[
+            PostbackTemplateAction(
+                label="詳細紀錄",
+                text="Menu!Query_Type_ALL",
+                data="A&詳細紀錄"
+            ),
+            PostbackTemplateAction(
+                label="統計紀錄",
+                text="Menu!Query_Type_SUM",
+                data="A&統計紀錄"
+            ),
+            PostbackTemplateAction(
+                label="下次進食時間",
+                text="Query_Next!Feed~~",
+                data="A&下次進食時間"
+            ),
         ]
     )
 )
@@ -64,14 +91,61 @@ log_btn = TemplateSendMessage(
             ),
             PostbackTemplateAction(
                 label='體重或體溫',
-                text='Menu!WT',
+                text='Menu!Log_WT',
                 data='A&體重或體溫'
             )
         ]
     )
 )
 
-
+log_history_btn = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        title='登記選單',
+        text='請選擇',
+        actions=[
+            PostbackTemplateAction(
+                label='奶',
+                text='Log!Milk***',
+                data='A&奶'
+            ),
+            PostbackTemplateAction(
+                label='大便',
+                text='Log!Daiper2***',
+                data='A&大便'
+            ),
+            PostbackTemplateAction(
+                label='小便',
+                text='Log!Daiper1***',
+                data='A&小便'
+            ),
+            PostbackTemplateAction(
+                label='體重或體溫',
+                text='Menu!Log_History_WT',
+                data='A&體重或體溫'
+            )
+        ]
+    )
+)
+log_history_btn2 = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        title='紀錄項目',
+        text='請選擇紀錄項目',
+        actions=[
+            PostbackTemplateAction(
+                label='體重',
+                text='Log!Weight***',
+                data='A&體重'
+            ),
+            PostbackTemplateAction(
+                label='體溫',
+                text='Log!Temperature***',
+                data='A&體溫'
+            )
+        ]
+    )
+)
 log_btn2 = TemplateSendMessage(
     alt_text='Buttons template',
     template=ButtonsTemplate(
@@ -148,6 +222,11 @@ day_btn = TemplateSendMessage(
                 label='一個月',
                 text='30',
                 data='A&一個月'
+            ),
+            PostbackTemplateAction(
+                label='三個月',
+                text='90',
+                data='A&三個月'
             )
         ]
     )

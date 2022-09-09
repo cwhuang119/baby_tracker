@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
-from tkinter import ALL
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -128,6 +127,11 @@ LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN')
 assert LINE_CHANNEL_ACCESS_TOKEN!=''
 LINE_CHANNEL_SECRET = os.environ.get('LINE_CHANNEL_SECRET')
 assert LINE_CHANNEL_SECRET!=''
+
+# from env import CHANNEL_SECRET,CHANNEL_ACCESS_TOKEN
+# LINE_CHANNEL_ACCESS_TOKEN = CHANNEL_ACCESS_TOKEN
+# LINE_CHANNEL_SECRET = CHANNEL_SECRET
+
 
 # import os
 # LOGGING = {

@@ -1,5 +1,4 @@
 
-from csv import Dialect
 import datetime
 import threading
 from baby.models import Daiper,Feed,BabyInfo,BabySitterInfo
@@ -8,6 +7,12 @@ from linebot import LineBotApi, WebhookParser
 import os
 LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN')
 assert LINE_CHANNEL_ACCESS_TOKEN!=''
+
+
+# from env import CHANNEL_SECRET,CHANNEL_ACCESS_TOKEN
+# LINE_CHANNEL_ACCESS_TOKEN = CHANNEL_ACCESS_TOKEN
+# LINE_CHANNEL_SECRET = CHANNEL_SECRET
+
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 from linebot.models import (
     MessageEvent,

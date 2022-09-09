@@ -101,10 +101,17 @@ def format_log(content,baby):
         "Temperature":"體溫"
     }
     result = f"寶寶:{baby.name}\n\n"
+    dates = {}
     for query_type,db_rows in content.items():
         if len(db_rows)>0:
             section_result = f"{header[query_type]}:\n"
+            dates[query_type]=[]
             for db_row in db_rows:
+                time_format = '%Y/%m/%d'
+                log_date = datetime.datetime.fromtimestamp(db_row.time_stamp).strftime(time_format)
+                if log_date not in dates[query_type]:
+                    dates[query_type].append(log_date)
+                    section_result+=f"\n{log_date}\n"
                 if query_type=='Daiper':
                     log_str = format_log_daiper(db_row)
                 elif query_type=='Feed':
@@ -142,7 +149,7 @@ def format_summary(summary_all):
         for date_str,value in summary.items():
             summary_str+=f"{date_str}\n"
             if log_type=='Daiper':
-                summary_str+=f'大便 : {value["Daiper1"]}次 小便 : {value["Daiper2"]}次\n'
+                summary_str+=f'大便 : {value["Daiper2"]}次 小便 : {value["Daiper1"]}次\n'
             elif log_type=='Feed':
                 summary_str+=f"奶量 : {value['Feed']} ml\n"
         summary_content+=summary_str
@@ -182,7 +189,7 @@ def summary_feed(db_rows):
 
 
 def format_log_daiper(db_row):
-    time_format = '%Y/%m/%d %H:%M'
+    time_format = '%H:%M'
     if db_row.change_type=='Daiper1':
         change_type='小便'
     else:
@@ -190,15 +197,15 @@ def format_log_daiper(db_row):
     return f"{datetime.datetime.fromtimestamp(db_row.time_stamp).strftime(time_format)} :{change_type}\n"
 
 def format_log_feed(db_row):
-    time_format = '%Y/%m/%d %H:%M'
+    time_format = '%H:%M'
     return f"{datetime.datetime.fromtimestamp(db_row.time_stamp).strftime(time_format)} :{int(db_row.volume)} ml\n"
 
 def format_log_weight(db_row):
-    time_format = '%Y/%m/%d %H:%M'
+    time_format = '%H:%M'
     return f"{datetime.datetime.fromtimestamp(db_row.time_stamp).strftime(time_format)} :{int(db_row.weight)} g\n"
 
 def format_log_temperature(db_row):
-    time_format = '%Y/%m/%d %H:%M'
+    time_format = '%H:%M'
     return f"{datetime.datetime.fromtimestamp(db_row.time_stamp).strftime(time_format)} :{db_row.temperature}度\n"
 
 
@@ -233,33 +240,45 @@ def log_action(msg,user_id):
     if sitter is None:
         return '使用尚未註冊'
     baby =sitter.baby
-    log_type = msg.split('**')[0].replace('Log!','')
-    data = msg.split('**')[1]
+    if '***' in msg:
+        parse_element='***'
+    else:
+        parse_element='**'
+    log_type = msg.split(parse_element)[0].replace('Log!','')
+    data = msg.split(parse_element)[1]
     value,log_time = data.split('@')
     if log_time=='None':
         log_time_stamp = int(time.time())
     else:
         log_time_stamp = convert_log_time_2_timestamp(log_time)
-    
-    return log_data(sitter,baby,log_type,value,log_time_stamp)
+    success,msg = log_data(sitter,baby,log_type,value,log_time_stamp)
+    if success:
+        send_log_message_to_all_user(sitter,baby,msg)
+    return msg
 
 
 def log_data(sitter,baby,log_type,value,log_time_stamp):
-
-    result = "紀錄完成"
+    success=True
+    msg = "紀錄完成"
     if log_type in ['Milk']:
         log_feed(baby,sitter,log_time_stamp,value)
+        msg = f"{sitter.name}紀錄{baby.name}喝奶{value}ml"
     elif log_type in ['Daiper2']:
         log_daiper(baby,sitter,log_time_stamp,value)
+        msg = f"{sitter.name}紀錄{baby.name}大便一次"
     elif log_type in ['Daiper1']:
         log_daiper(baby,sitter,log_time_stamp,value)
+        msg = f"{sitter.name}紀錄{baby.name}小便便一次"
     elif log_type in ['Temperature']:
         log_temperature(baby,sitter,log_time_stamp,value)
+        msg = f"{sitter.name}紀錄{baby.name}體溫{value}"
     elif log_type in ['Weight']:
         log_weight(baby,sitter,log_time_stamp,value)
+        msg = f"{sitter.name}紀錄{baby.name}體重{value}"
     else:
-        result = "無效輸入!"
-    return result
+        msg = "無效輸入!"
+        success=False
+    return success,msg
 
 def convert_log_time_2_timestamp(time_str):
     return time.mktime(datetime.datetime.strptime(time_str,"%Y%m%d%H%M").timetuple())
@@ -307,7 +326,18 @@ from linebot.models import (
     PostbackEvent,
     PostbackTemplateAction
 )
-from baby.element import log_btn,day_btn,menu_btn,log_btn2,query_type_all_btn,query_type_sum_btn,reminder_btn
+from baby.element import (
+        log_btn,
+        day_btn,
+        menu_btn,
+        log_btn2,
+        query_type_all_btn,
+        query_type_sum_btn,
+        reminder_btn,
+        log_history_btn,
+        query_btn,
+        log_history_btn2
+    )
 
 def parsing_query_data(msg,user_id):
     #return followup question => select period
@@ -315,14 +345,27 @@ def parsing_query_data(msg,user_id):
         return True,day_btn
     else:
         return False,TextSendMessage(search_action(msg,user_id))
-    
+        
+def parsing_query_next(msg,user_id):
+    #return next action time 
+    pass
 
 def parsing_log_data(msg,user_id):
 
     #followup questions
     if '***' == msg[-3:]:
-        return True,TextSendMessage('請輸入日期,ex:202208081716')
-
+        if msg =='Log!Milk***':
+            return True,TextSendMessage('請輸入奶量(ml)')
+        elif msg=='Log!Weight***':
+            return True,TextSendMessage('請輸入體重(g)')
+        elif msg=='Log!Temperature***':
+            return True,TextSendMessage('請輸入體溫(c)')
+        elif msg in ['Log!Daiper2***','Log!Daiper1***']:
+            return True,TextSendMessage('請輸入日期,ex:@202208081716')
+    elif '***' in msg:
+        if '@' not in msg:
+            return True,TextSendMessage('請輸入日期,ex:@202208081716')
+        return False,TextSendMessage(log_action(msg,user_id))
     #followup questions
     elif '**'==msg[-2:]:
         if msg=='Log!Milk**':
@@ -372,14 +415,21 @@ def menu_options(msg,user_id):
     menu_type = msg.split('Menu!')[-1]
     if menu_type=='Log':
         return False,log_btn
+    elif menu_type=='Query':
+        return False,query_btn
     elif menu_type=='Query_Type_SUM':
         return False,query_type_sum_btn
     elif menu_type=='Query_Type_ALL':
         return False,query_type_all_btn
-    elif menu_type=='WT':
+    elif menu_type=='Log_WT':
         return False,log_btn2
     elif menu_type=='Reimder_Type':
         return False,reminder_btn
+    elif menu_type=='Log_History':
+        return False,log_history_btn
+    elif menu_type=='Log_History_WT':
+        return False,log_history_btn2
+
 
 def message_parsing(msg,user_id):
     print('msg',msg,'user_id',user_id)
@@ -397,10 +447,18 @@ def message_parsing(msg,user_id):
     #admin actions
     elif ';' in msg:
         return False,TextSendMessage(admin_action(msg,user_id))
-
+    elif '~~' in msg:
+        return False,parsing_query_next(msg,user_id)
     else:
         #enter log btn
         return False,menu_btn
 
 
 
+def send_log_message_to_all_user(log_sitter,baby,msg):
+    sitters = BabySitterInfo.objects.filter(baby=baby)
+    log_sitter_id = log_sitter.user_id
+    for sitter in sitters:
+        user_id = sitter.user_id
+        if user_id !=log_sitter_id:
+            reminder.send_message(user_id,msg)

@@ -18,6 +18,38 @@ menu_btn = TemplateSendMessage(
         text="請選擇",
         actions=[
             PostbackTemplateAction(
+                label='登記/補登',
+                text='Menu!Logs',
+                data='A&登記/補登'
+            ),
+            PostbackTemplateAction(
+                label="查詢",
+                text="Menu!Query",
+                data="A&查詢"
+            ),
+            PostbackTemplateAction(
+                label="設定",
+                text="Menu!Settings",
+                data="A&設定"
+            ),
+            PostbackTemplateAction(
+                label="建議",
+                text="Menu!Suggestions",
+                data="A&建議"
+            ),
+
+        ]
+    )
+)
+
+
+log_menu_btn = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        title='紀錄',
+        text='請選擇',
+        actions=[
+            PostbackTemplateAction(
                 label='登記',
                 text='Menu!Log',
                 data='A&登記'
@@ -27,19 +59,10 @@ menu_btn = TemplateSendMessage(
                 text='Menu!Log_History',
                 data='A&補登'
             ),
-            PostbackTemplateAction(
-                label="查詢",
-                text="Menu!Query",
-                data="A&查詢"
-            ),
-            PostbackTemplateAction(
-                label="提醒設定",
-                text="Menu!Reimder_Type",
-                data="A&提醒設定"
-            )
         ]
     )
 )
+
 
 
 
@@ -258,6 +281,83 @@ reminder_btn = TemplateSendMessage(
                 text='Reminder!Daiper$$-1',
                 data='A&取消提醒換尿布'
             )
+        ]
+    )
+)
+
+suggestions_menu_btn = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        title='請選擇',
+        text='選擇',
+        actions=[
+            PostbackTemplateAction(
+                label='建議下次餵奶時間',
+                text='Suggestion!FeedTime##',
+                data='A&建議下次餵奶時間'
+            ),
+            PostbackTemplateAction(
+                label='建議奶量',
+                text='Suggestion!Feed##',
+                data='A&建議奶量'
+            )
+        ]
+    )
+)
+
+settings_menu_btn = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        title='設定',
+        text='請選擇',
+        actions=[
+            PostbackTemplateAction(
+                label="提醒設定",
+                text="Menu!Reimder_Type",
+                data="A&提醒設定"
+            ),
+            PostbackTemplateAction(
+                label="寶寶設定",
+                text="Menu!Baby_Customs",
+                data="A&寶寶設定"
+            )
+        ]
+    )
+)
+
+
+baby_customs_btn = TemplateSendMessage(
+    alt_text='Buttons template',
+    template=ButtonsTemplate(
+        title='寶寶設定',
+        text='請選擇',
+        actions=[
+            PostbackTemplateAction(
+                label='生日',
+                text='Baby_Customs!Birthday^^',
+                data='A&生日'
+            ),
+            PostbackTemplateAction(
+                label='性別',
+                text='Baby_Customs!Gender^^',
+                data='A&性別'
+            ),
+            PostbackTemplateAction(
+                label='餵奶間隔時間',
+                text='Baby_Customs!FeedInterval^^',
+                data='A&餵奶間隔時間'
+            ),
+            PostbackTemplateAction(
+                label='每日餵奶次數',
+                text='Baby_Customs!FeedFrequency^^',
+                data='A&每日餵奶次數'
+            ),
+
+            # PostbackTemplateAction(
+            #     label='檢視設定',
+            #     text='Baby_Customs!Check^^Check',
+            #     data='A&檢視設定'
+            # ),
         ]
     )
 )

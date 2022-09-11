@@ -1,15 +1,30 @@
-from sqlite3 import Timestamp
 from django.db import models
-
+import datetime
+import django
 # Create your models here.
 
 class BabyInfo(models.Model):
     name = models.CharField(max_length=200)
+    birthday = models.DateField(default=django.utils.timezone.now().date(), blank=True)
+    gender = models.CharField(max_length=10,default="")
+
+
+class BabyCustoms(models.Model):
+    baby = models.ForeignKey(BabyInfo, on_delete=models.CASCADE)
+    feed_frequency = models.IntegerField(blank=True,null=True,default=None)
+    feed_interval = models.IntegerField(blank=True,null=True,default=None)
+
+
 
 class BabySitterInfo(models.Model):
     user_id = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
     baby = models.ForeignKey(BabyInfo, on_delete = models.CASCADE)
+
+class BabySitterCustoms(models.Model):
+    sitter = models.ForeignKey(BabySitterInfo, on_delete=models.CASCADE)
+    extract_milk_interval = models.IntegerField()
+    extract_volumn = models.IntegerField()
 
 
 class Daiper(models.Model):

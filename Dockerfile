@@ -4,6 +4,7 @@ WORKDIR /workspace
 ADD app /workspace
 #RUN apt update
 RUN rm -r /workspace/db
+#RUN rm -r /workspace/baby/migrations
 #ENV DEBIAN_FRONTEND noninteractive
 #RUN apt install python3-pip -y
 #RUN apt-get install python3-tk -y

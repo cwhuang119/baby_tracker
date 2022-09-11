@@ -3,6 +3,7 @@ from baby.models import BabyInfo,BabySitterInfo
 import re
 from baby.models import BabyInfo,BabySitterInfo
 from baby.models import Feed,Daiper,Weight,Temperature
+from baby.models import BabyCustoms,BabySitterCustoms
 import datetime
 import time
 import logging
@@ -92,7 +93,8 @@ def query_log(baby,period,query_types):
                 content[query_type].append(db_row)
 
     return content
-
+def time_stamp_2_time_str(time_stamp,time_format):
+    return datetime.datetime.fromtimestamp(time_stamp).strftime(time_format)
 def format_log(content,baby):
     header = {
         "Daiper":"尿布",
@@ -252,7 +254,9 @@ def log_action(msg,user_id):
     else:
         log_time_stamp = convert_log_time_2_timestamp(log_time)
     success,msg = log_data(sitter,baby,log_type,value,log_time_stamp)
-    if success:
+    if success and log_time=='None':
+        #when log current action, send msg 
+        #log history will not send message
         send_log_message_to_all_user(sitter,baby,msg)
     return msg
 
@@ -336,7 +340,11 @@ from baby.element import (
         reminder_btn,
         log_history_btn,
         query_btn,
-        log_history_btn2
+        log_history_btn2,
+        baby_customs_btn,
+        settings_menu_btn,
+        log_menu_btn,
+        suggestions_menu_btn
     )
 
 def parsing_query_data(msg,user_id):
@@ -429,9 +437,18 @@ def menu_options(msg,user_id):
         return False,log_history_btn
     elif menu_type=='Log_History_WT':
         return False,log_history_btn2
+    elif menu_type=='Baby_Customs':
+        return False,baby_customs_btn
+    elif menu_type=='Settings':
+        return False,settings_menu_btn
+    elif menu_type=='Logs':
+        return False,log_menu_btn
+    elif menu_type=='Suggestions':
+        return False,suggestions_menu_btn
 
 
 def message_parsing(msg,user_id):
+    reminder.start_thread()
     print('msg',msg,'user_id',user_id)
     if 'Menu!' in msg:
         return menu_options(msg,user_id)
@@ -447,8 +464,14 @@ def message_parsing(msg,user_id):
     #admin actions
     elif ';' in msg:
         return False,TextSendMessage(admin_action(msg,user_id))
-    elif '~~' in msg:
-        return False,parsing_query_next(msg,user_id)
+    # elif '~~' in msg:
+    #     return False,parsing_query_next(msg,user_id)
+    #suggestions
+    elif '##' in msg:
+        return parsing_suggestions(msg,user_id)
+    #set baby customs : feed interval...
+    elif '^^' in msg:
+        return parsing_baby_custom(msg,user_id)
     else:
         #enter log btn
         return False,menu_btn
@@ -462,3 +485,111 @@ def send_log_message_to_all_user(log_sitter,baby,msg):
         user_id = sitter.user_id
         if user_id !=log_sitter_id:
             reminder.send_message(user_id,msg)
+
+
+def parsing_suggestions(msg,user_id):
+    sitter = get_sitter_from_user_id(user_id)
+    baby=sitter.baby
+    suggestion_type = msg.split('!')[-1].split('##')[0]
+    baby_customs = BabyCustoms.objects.filter(baby=baby)
+    if len(baby_customs)>0:
+        baby_customs=baby_customs[0]
+    else:
+        return False,TextSendMessage("請先設定相關資料")
+    if suggestion_type=='Feed':
+        baby_weights = Weight.objects.filter(baby=baby).order_by('-time_stamp')
+        if len(baby_weights)>0:
+            baby_weight=baby_weights[0].weight
+            feed_vol = [round(baby_weight*120/1000),round(baby_weight*150/1000)]
+            return_msg = f"根據最後一次體重{baby_weight}g\n每日建議奶量{feed_vol[0]}-{feed_vol[1]}ml"
+            feed_frequency = baby_customs.feed_frequency
+            if feed_frequency!=None:
+                return_msg+=f"\n每餐建議奶量{round(feed_vol[0]/feed_frequency)}-{round(feed_vol[1]/feed_frequency)}ml"
+        else:
+            return_msg="尚未設定體重"
+    elif suggestion_type=='FeedTime':
+        feeds = Feed.objects.filter(baby=baby).order_by('-time_stamp')
+        feed_interval = baby_customs.feed_interval
+        if len(feeds)>0:
+            last_feed_time = datetime.datetime.fromtimestamp(int(feeds[0].time_stamp))
+            next_feed_times = []
+            for i in range(2):
+                next_feed_time = last_feed_time+datetime.timedelta(minutes=(feed_interval*(i+1)))
+                next_feed_times.append(next_feed_time)
+            time_format = '%H:%M'
+            return_msg = f"下次餵奶時間:{datetime.datetime.strftime(next_feed_times[0],time_format)}\n下下次餵奶時間:{datetime.datetime.strftime(next_feed_times[1],time_format)}"
+    return False,TextSendMessage(return_msg)
+
+def parsing_baby_custom(msg,user_id):
+    
+    sitter = get_sitter_from_user_id(user_id)
+    
+    set_item = msg.split('!')[-1].split('^^')[0]
+    if '^^' == msg[-2:]:
+        #SetBabyCm!Birthday^^
+        questions = {
+            "Birthday":"請輸入生日ex:20220806",
+            "FeedInterval":"請輸入餵奶間隔(分鐘)ex:240",
+            "FeedFrequency":"請輸入每日餵奶次數ex:6",
+            "Gender":"請輸入性別ex:男/女"
+        }
+        return True,TextSendMessage(questions[set_item])
+    else:
+        #SetBabyCm!Birthday^^20220806
+        baby=sitter.baby
+        baby_customs = BabyCustoms.objects.filter(baby=baby)
+        value = msg.split('^^')[-1]
+        if set_item=='Check':
+            if len(baby_customs)>0:
+                baby_customs=baby_customs[0]
+                msg = f"生日:\n{baby_customs.birthday}\n餵奶間隔:\n{baby_customs.feed_interval}\n每日餵奶次數:\n{baby_customs.feed_frequency}"
+            else:
+                msg = '設定尚未建置'
+            return False,TextSendMessage(msg)
+        
+        if len(baby_customs)>0:
+            if set_item =='Birthday':
+                birthday = datetime.datetime.strftime(datetime.datetime.strptime(value,'%Y%m%d'),'%Y-%m-%d')
+                baby_info = BabyInfo.objects.filter(name=baby.name)
+                baby_info.update(birthday=birthday)
+
+            elif set_item=='FeedInterval':
+                baby_customs.update(feed_interval=int(value))
+            elif set_item=='FeedFrequency':
+                baby_customs.update(feed_frequency=int(value))
+            elif set_item=='Gender':
+                if value=='男':
+                    gender='boy'
+                    # gender=True
+                else:
+                    gender='girl'
+                    # gender=False
+                baby_info = BabyInfo.objects.filter(name=baby.name)
+                baby_info.update(gender=gender)
+            return False,TextSendMessage("資料已更新")
+        else:
+            birthday,feed_interval,feed_frequency,gender=None,None,None,None
+            if set_item =='Birthday':
+                birthday = datetime.datetime.strftime(datetime.datetime.strptime(value,'%Y%m%d'),'%Y-%m-%d')
+                baby_info = BabyInfo.objects.filter(name=baby.name)
+                baby_info.update(birthday=birthday)
+            elif set_item=='FeedInterval':
+                feed_interval=int(value)
+            elif set_item=='FeedFrequency':
+                feed_frequency=int(value)
+            elif set_item=='Gender':
+                if value=='男':
+                    gender='boy'
+                    # gender=True
+                else:
+                    gender='girl'
+                    # gender=False
+                baby_info = BabyInfo.objects.filter(name=baby.name)
+                baby_info.update(gender=gender)
+            baby_customs = BabyCustoms(
+                baby=baby,
+                feed_interval=feed_interval,
+                feed_frequency=feed_frequency,
+            )
+            baby_customs.save()
+            return False,TextSendMessage("資料已建置")

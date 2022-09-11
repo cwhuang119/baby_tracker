@@ -29,6 +29,7 @@ class Reminder:
         self.reminder_data = {}
         self.check_interval = 600
         self.sent_reminder_list = {}
+        self.thread_on = False
     def gen_data_key(self,baby_name,reminder_type):
         return f"{baby_name}****{reminder_type}"
     def split_data_key(self,data_key):
@@ -90,7 +91,11 @@ class Reminder:
         while True:
             self.check()
             time.sleep(self.check_interval)
-
+    def start_thread(self):
+        if self.thread_on==False:
+            print('start thread')
+            t = threading.Thread(target=self.loop_check)
+            t.start()
 reminder = Reminder(line_bot_api)
-t = threading.Thread(target=reminder.loop_check)
-t.start()
+
+# t.start()

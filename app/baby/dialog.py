@@ -518,6 +518,9 @@ def parsing_suggestions(msg,user_id):
                 next_feed_times.append(next_feed_time)
             time_format = '%H:%M'
             return_msg = f"下次餵奶時間:{datetime.datetime.strftime(next_feed_times[0],time_format)}\n下下次餵奶時間:{datetime.datetime.strftime(next_feed_times[1],time_format)}"
+    elif suggestion_type=='Sleep':
+        birthday = baby.birthday
+        return_msg = suggestion_sleep_time_table(birthday)
     return False,TextSendMessage(return_msg)
 
 def parsing_baby_custom(msg,user_id):
@@ -593,3 +596,55 @@ def parsing_baby_custom(msg,user_id):
             )
             baby_customs.save()
             return False,TextSendMessage("資料已建置")
+
+
+
+def suggestion_sleep_time_table(birthday):
+    date_delta = int((datetime.datetime.now().date()-birthday).days)
+    sleep_time_table = {
+        "0-14":{
+            "total":"17.5-18.5",
+            "day_sleep":"5.5-6.5",
+            "night_sleep":"12"
+        },
+        "14-28":{
+            "total":"17-18",
+            "day_sleep":"5-6",
+            "night_sleep":"12"
+        },
+        "28-42":{
+            "total":"17",
+            "day_sleep":"5",
+            "night_sleep":"12"
+        },
+        "42-56":{
+            "total":"16",
+            "day_sleep":"4",
+            "night_sleep":"12"
+        },
+        "56-90":{
+            "total":"15.5",
+            "day_sleep":"3.5",
+            "night_sleep":"12"
+        },
+        "90-180":{
+            "total":"14.5-15",
+            "day_sleep":"2.5-3",
+            "night_sleep":"12"
+        },
+        "180-270":{
+            "total":"14.5",
+            "day_sleep":"2.5",
+            "night_sleep":"12"
+        },
+        "270-365":{
+            "total":"14-14.5",
+            "day_sleep":"2-2.5",
+            "night_sleep":"12"
+        }
+    }
+    for k,v in sleep_time_table.items():
+        start,end = [int(x) for x in k.split('-')]
+        if date_delta>start and date_delta<=end:
+            return f"建議睡眠時間:\n總睡眠時數:{v['total']}小時\n白天睡眠時數:{v['day_sleep']}小時\n晚上睡眠時數:{v['night_sleep']}小時"
+    return "無法顯示"

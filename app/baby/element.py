@@ -300,6 +300,11 @@ suggestions_menu_btn = TemplateSendMessage(
                 label='建議奶量',
                 text='Suggestion!Feed##',
                 data='A&建議奶量'
+            ),
+            PostbackTemplateAction(
+                label='建議睡眠時數',
+                text='Suggestion!Sleep##',
+                data='A&建議睡眠時數'
             )
         ]
     )

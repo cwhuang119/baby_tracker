@@ -84,8 +84,11 @@ class Reminder:
             self.send_message(sitter_id,msg)
 
     def send_message(self,user_id,message):
-        self.line_bot_api.push_message(user_id,TextSendMessage(text=message))
-
+        try:
+            self.line_bot_api.push_message(user_id,TextSendMessage(text=message))
+        except Exception as e:
+            print(str(e))
+            print('Failed to send message')
 
     def loop_check(self):
         while True:

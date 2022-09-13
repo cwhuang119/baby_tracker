@@ -1,9 +1,10 @@
-from tracemalloc import start
 from baby.models import BabyInfo,BabySitterInfo
 import re
 from baby.models import BabyInfo,BabySitterInfo
 from baby.models import Feed,Daiper,Weight,Temperature
 from baby.models import BabyCustoms,BabySitterCustoms
+from baby.models import HeadLength, Height
+
 import datetime
 import time
 import logging
@@ -85,6 +86,10 @@ def query_log(baby,period,query_types):
             db_rows = Weight.objects.filter(baby=baby).order_by('time_stamp')
         elif query_type=='Temperature':
             db_rows = Temperature.objects.filter(baby=baby).order_by('time_stamp')
+        elif query_type=='Height':
+            db_rows = Height.objects.filter(baby=baby).order_by('time_stamp')
+        elif query_type=='HeadLength':
+            db_rows = HeadLength.objects.filter(baby=baby).order_by('time_stamp')
         content[query_type]=[]
 
         for db_row in db_rows:
@@ -100,7 +105,9 @@ def format_log(content,baby):
         "Daiper":"尿布",
         "Feed":"進食",
         "Weight":"體重",
-        "Temperature":"體溫"
+        "Temperature":"體溫",
+        "Height":"身高",
+        "HeadLength":"頭圍"
     }
     result = f"寶寶:{baby.name}\n\n"
     dates = {}
@@ -122,6 +129,10 @@ def format_log(content,baby):
                     log_str = format_log_weight(db_row)
                 elif query_type=='Temperature':
                     log_str = format_log_temperature(db_row)
+                elif query_type=='Height':
+                    log_str = format_log_height(db_row)
+                elif query_type=='HeadLength':
+                    log_str = format_log_head_length(db_row)
                 section_result+=log_str
             section_result+='\n'
             result+=section_result
@@ -209,7 +220,13 @@ def format_log_weight(db_row):
 def format_log_temperature(db_row):
     time_format = '%H:%M'
     return f"{datetime.datetime.fromtimestamp(db_row.time_stamp).strftime(time_format)} :{db_row.temperature}度\n"
+def format_log_height(db_row):
+    time_format = '%H:%M'
+    return f"{datetime.datetime.fromtimestamp(db_row.time_stamp).strftime(time_format)} :{int(db_row.height)} cm\n"
 
+def format_log_head_length(db_row):
+    time_format = '%H:%M'
+    return f"{datetime.datetime.fromtimestamp(db_row.time_stamp).strftime(time_format)} :{int(db_row.head_length)} cm\n"
 
 def search_action(msg,user_id):
     if 'Query_ALL'in msg:
@@ -272,13 +289,19 @@ def log_data(sitter,baby,log_type,value,log_time_stamp):
         msg = f"{sitter.name}紀錄{baby.name}大便一次"
     elif log_type in ['Daiper1']:
         log_daiper(baby,sitter,log_time_stamp,value)
-        msg = f"{sitter.name}紀錄{baby.name}小便便一次"
+        msg = f"{sitter.name}紀錄{baby.name}小便一次"
     elif log_type in ['Temperature']:
         log_temperature(baby,sitter,log_time_stamp,value)
         msg = f"{sitter.name}紀錄{baby.name}體溫{value}"
     elif log_type in ['Weight']:
         log_weight(baby,sitter,log_time_stamp,value)
-        msg = f"{sitter.name}紀錄{baby.name}體重{value}"
+        msg = f"{sitter.name}紀錄{baby.name}體重{value}g"
+    elif log_type in ['Height']:
+        log_height(baby,sitter,log_time_stamp,value)
+        msg = f"{sitter.name}紀錄{baby.name}身高{value}cm"
+    elif log_type in ['HeadLength']:
+        log_head_length(baby,sitter,log_time_stamp,value)
+        msg = f"{sitter.name}紀錄{baby.name}頭圍{value}cm"
     else:
         msg = "無效輸入!"
         success=False
@@ -320,7 +343,22 @@ def log_weight(baby,sitter,time_stamp,w):
         weight=w
     )
     weight.save()
-
+def log_height(baby,sitter,time_stamp,h):
+    weight = Height(
+        baby=baby,
+        sitter=sitter,
+        time_stamp=time_stamp,
+        height=h
+    )
+    weight.save()
+def log_head_length(baby,sitter,time_stamp,hl):
+    weight = HeadLength(
+        baby=baby,
+        sitter=sitter,
+        time_stamp=time_stamp,
+        head_length=hl
+    )
+    weight.save()
 from linebot.models import (
     MessageEvent,
     TextSendMessage,
@@ -368,6 +406,12 @@ def parsing_log_data(msg,user_id):
             return True,TextSendMessage('請輸入體重(g)')
         elif msg=='Log!Temperature***':
             return True,TextSendMessage('請輸入體溫(c)')
+
+        elif msg=='Log!Height***':
+            return True,TextSendMessage('請輸入身高(cm)')
+        elif msg=='Log!HeadLength***':
+            return True,TextSendMessage('請輸入頭圍(cm)')
+
         elif msg in ['Log!Daiper2***','Log!Daiper1***']:
             return True,TextSendMessage('請輸入日期,ex:@202208081716')
     elif '***' in msg:
@@ -388,6 +432,10 @@ def parsing_log_data(msg,user_id):
             return True,TextSendMessage('請輸入體重(g)')
         elif msg=='Log!Temperature**':
             return True,TextSendMessage('請輸入體溫(c)')
+        elif msg=='Log!Height**':
+            return True,TextSendMessage('請輸入身高(cm)')
+        elif msg=='Log!HeadLength**':
+            return True,TextSendMessage('請輸入頭圍(cm)')
 
     #log data has value 
     #Log!Milk**200

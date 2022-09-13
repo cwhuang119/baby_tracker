@@ -113,9 +113,9 @@ log_btn = TemplateSendMessage(
                 data='A&小便'
             ),
             PostbackTemplateAction(
-                label='體重或體溫',
+                label='體重/體溫/身高/頭圍',
                 text='Menu!Log_WT',
-                data='A&體重或體溫'
+                data='A&體重/體溫/身高/頭圍'
             )
         ]
     )
@@ -165,6 +165,16 @@ log_history_btn2 = TemplateSendMessage(
                 label='體溫',
                 text='Log!Temperature***',
                 data='A&體溫'
+            ),
+            PostbackTemplateAction(
+                label='身高',
+                text='Log!Height***',
+                data='A&身高'
+            ),
+            PostbackTemplateAction(
+                label='頭圍',
+                text='Log!HeadLength***',
+                data='A&頭圍'
             )
         ]
     )
@@ -184,6 +194,16 @@ log_btn2 = TemplateSendMessage(
                 label='體溫',
                 text='Log!Temperature**',
                 data='A&體溫'
+            ),
+            PostbackTemplateAction(
+                label='身高',
+                text='Log!Height**',
+                data='A&身高'
+            ),
+            PostbackTemplateAction(
+                label='頭圍',
+                text='Log!HeadLength**',
+                data='A&頭圍'
             )
         ]
     )
@@ -219,6 +239,11 @@ query_type_all_btn = TemplateSendMessage(
                 label='體重與體溫',
                 text='Query_ALL!Weight&Temperature@@',
                 data='A&體重與體溫'
+            ),
+            PostbackTemplateAction(
+                label='身高與頭圍',
+                text='Query_ALL!Height&HeadLength@@',
+                data='A&身高與頭圍'
             ),
         ]
     )

@@ -49,6 +49,21 @@ class Weight(models.Model):
     weight = models.FloatField()
     image = models.CharField(max_length=200)
 
+class Height(models.Model):
+    baby = models.ForeignKey(BabyInfo, on_delete=models.CASCADE)
+    sitter = models.ForeignKey(BabySitterInfo, on_delete=models.CASCADE)
+    time_stamp = models.IntegerField()
+    height = models.FloatField()
+    image = models.CharField(max_length=200)
+
+class HeadLength(models.Model):
+    baby = models.ForeignKey(BabyInfo, on_delete=models.CASCADE)
+    sitter = models.ForeignKey(BabySitterInfo, on_delete=models.CASCADE)
+    time_stamp = models.IntegerField()
+    head_length = models.FloatField()
+    image = models.CharField(max_length=200)
+
+
 
 class Temperature(models.Model):
     baby = models.ForeignKey(BabyInfo, on_delete=models.CASCADE)

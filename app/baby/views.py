@@ -24,7 +24,7 @@ def callback(request):
         message = event_content['message']
         user_id = event_content['user_id']
         reply_token = event_content['reply_token']
-        return_data = dailog_controller.process(message,user_id,followup=False)
+        return_data = dailog_controller.process(message,user_id)
         linebot.reply_message(reply_token,return_data)
         return HttpResponse()
     else:

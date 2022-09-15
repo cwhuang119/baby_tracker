@@ -7,7 +7,7 @@ from baby.element_map import REMINDER_BTN
 from baby.element_map import QUERY_ALL_BTN
 from baby.element_map import QUERY_SUM_BTN
 
-def build_menu(request_types,request_data):
+def build_menu(request_types):
     request_type=request_types[0]
     if request_type=='All':
         menu_content = {

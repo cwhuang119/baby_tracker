@@ -8,7 +8,6 @@ from baby.models import HeadLength, Height
 import datetime
 import time
 import logging
-from baby.reminder import reminder
 
 def signup_user(user_id,sitter_name,baby_name):
     result = ""

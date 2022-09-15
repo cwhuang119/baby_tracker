@@ -21,3 +21,12 @@ Since Line bot message API only accept https, so you need to use ngork to router
 ```sh
 ./ngrok http 8000
 ```
+
+## Dailog Flow
+1. Check Line Events
+2. Get Message
+3. Parsing Message
+4. Execute Actions
+5. Check Actions Status
+6. Generate Return Message
+7. Build Line Object

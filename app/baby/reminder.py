@@ -3,29 +3,10 @@ import datetime
 import threading
 from baby.models import Daiper,Feed,BabyInfo,BabySitterInfo
 import time
-from linebot import LineBotApi, WebhookParser
-import os
-LINE_CHANNEL_ACCESS_TOKEN = os.environ.get('LINE_CHANNEL_ACCESS_TOKEN')
-assert LINE_CHANNEL_ACCESS_TOKEN!=''
 
-
-# from env import CHANNEL_SECRET,CHANNEL_ACCESS_TOKEN
-# LINE_CHANNEL_ACCESS_TOKEN = CHANNEL_ACCESS_TOKEN
-# LINE_CHANNEL_SECRET = CHANNEL_SECRET
-
-line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
-from linebot.models import (
-    MessageEvent,
-    TextSendMessage,
-    TemplateSendMessage,
-    ButtonsTemplate,
-    MessageTemplateAction,
-    PostbackEvent,
-    PostbackTemplateAction
-)
 class Reminder:
-    def __init__(self,line_bot_api):
-        self.line_bot_api=line_bot_api
+    def __init__(self,linebot):
+        self.linebot=linebot
         self.reminder_data = {}
         self.check_interval = 600
         self.sent_reminder_list = {}
@@ -85,7 +66,7 @@ class Reminder:
 
     def send_message(self,user_id,message):
         try:
-            self.line_bot_api.push_message(user_id,TextSendMessage(text=message))
+            self.linebot.push_message(user_id,message)
         except Exception as e:
             print(str(e))
             print('Failed to send message')
@@ -99,6 +80,3 @@ class Reminder:
             print('start thread')
             t = threading.Thread(target=self.loop_check)
             t.start()
-reminder = Reminder(line_bot_api)
-
-# t.start()

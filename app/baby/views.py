@@ -12,7 +12,6 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-from baby.dailogflow import DailogController
 from baby.states import linebot,reminder,dailog_controller
 
 @csrf_exempt

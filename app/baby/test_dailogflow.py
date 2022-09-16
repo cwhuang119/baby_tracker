@@ -1,14 +1,46 @@
 from unittest import TestCase
 
-from baby.dailogflow import MessageParser
+from baby.dailogflow import MessageParser,DailogController
+
+from baby.models import BabyInfo,BabySitterInfo,Feed
 
 class DailogFlowTestCase(TestCase):
 
     def setUp(self):
-        pass
+        
+        self.user_id = 'test_user_id'
+        if len(BabyInfo.objects.filter(name='baby'))==0:
+            BabyInfo.objects.create(name='baby')
+            baby = BabyInfo.objects.get(name='baby')
+            BabySitterInfo.objects.create(name='test',user_id=self.user_id,baby=baby)
+        self.log_message = ['123123123','Menu!!LogType','Menu!!Log','Log11Feed**','100']
+        self.check_log = ['123123123','Menu!!QueryType','QueryAll!!Feed**','1']
+    def test_cache(self):
 
-    def test_1(self):
-        pass
+        dailog_controller = DailogController()
+        msg1 = 'Test!!test'
+        return_data = dailog_controller.process(msg1,self.user_id)
+        self.assertEqual(return_data,{'type': 'text', 'content': 'test', 'follow_up': True})
+        self.assertEqual(msg1,dailog_controller.get_last_msg(self.user_id))
+
+        msg2='123123'
+        return_data = dailog_controller.process(msg2,self.user_id)
+        self.assertEqual(return_data,{'type': 'text', 'content': 'test', 'follow_up': True})
+        self.assertEqual(msg1+msg2,dailog_controller.get_last_msg(self.user_id))
+
+        msg3 = 'Test!!123123'
+        return_data = dailog_controller.process(msg3,self.user_id)
+        self.assertEqual(return_data['type'],'button')
+        self.assertEqual('',dailog_controller.get_last_msg(self.user_id))
+
+    def test_log_flow(self):
+        dailog_controller = DailogController()
+        for msg in self.log_message:
+            return_data = dailog_controller.process(msg,self.user_id)
+        for msg in self.check_log:
+            return_data = dailog_controller.process(msg,self.user_id)
+
+
 
 class MessageParserTestCase(TestCase):
     

@@ -6,6 +6,7 @@ from baby.element_map import MENU_BTN
 from baby.element_map import REMINDER_BTN
 from baby.element_map import QUERY_ALL_BTN
 from baby.element_map import QUERY_SUM_BTN
+from baby.element_map import LOG_BTN
 
 def build_menu(request_types):
     request_type=request_types[0]
@@ -15,7 +16,7 @@ def build_menu(request_types):
             "text":"請選擇",
             "actions_data":[
                 MENU_BTN['LogType'],
-                MENU_BTN['Query'],
+                MENU_BTN['QueryType'],
                 MENU_BTN['Settings'],
                 MENU_BTN['Suggestions']
             ]
@@ -30,7 +31,7 @@ def build_menu(request_types):
                 MENU_BTN['LogHistory'],
             ]
         }
-    elif request_type=='Query':
+    elif request_type=='QueryType':
         menu_content = {
             "title":"功能選單",
             "text":"請選擇",
@@ -98,10 +99,19 @@ def build_menu(request_types):
                 QUERY_SUM_BTN['Feed&Daiper'],
             ]
         }
+    elif request_type=='Log':
+        menu_content = {
+            "title":"功能選單",
+            "text":"請選擇",
+            "actions_data":[
+                LOG_BTN['Feed'],
+                LOG_BTN['Daiper1'],
+                LOG_BTN['Daiper2'],
+                MENU_BTN['LogOther'],
+
+            ]
+        }
     else:
         raise KeyError(f"Invalid request_type:{request_type}")
-    menu_data = {
-        "type":"button",
-        "content":menu_content
-    }
-    return menu_data
+
+    return menu_content

@@ -24,9 +24,9 @@ MENU_BTN = {
         "text":"Menu!!LogHistory",
         "data":"A&補登"
     },
-    "Query":{
+    "QueryType":{
         "label":"查詢",
-        "text":"Menu!!Query",
+        "text":"Menu!!QueryType",
         "data":"A&查詢"
     },
     "Settings":{
@@ -54,6 +54,11 @@ MENU_BTN = {
         "text":"Menu!!LogHistoryOther",
         "data":"A&體重/體溫/身高/頭圍"
     },
+    "LogOther":{
+        "label":"體重/體溫/身高/頭圍",
+        "text":"Menu!!LogOther",
+        "data":"A&體重/體溫/身高/頭圍"
+    },
     "QueryTypeAll":{
         "label":"詳細記錄",
         "text":"Menu!!QueryTypeAll",
@@ -69,7 +74,7 @@ MENU_BTN = {
 LOG_BTN = {
     "Feed":{
         "label":"餵奶",
-        "text":"Log!!Milk**",
+        "text":"Log!!Feed**",
         "data":"A&餵奶"
     },
     "Daiper1":{

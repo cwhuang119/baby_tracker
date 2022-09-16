@@ -8,7 +8,6 @@ class LineBot:
     def __init__(self,token:str,secret:str):
         self.line_bot_api = LineBotApi(token)
         self.parser = WebhookParser(secret)
-
     def parse_event(self,body,signature):
         try:
             events = self.parser.parse(body, signature) 
@@ -37,7 +36,7 @@ class LineBot:
             "reply_token":reply_token,
             "message":message
         }
-
+    
     def reply_message(self,token,data):
         line_element = build_line_element(data)
         self.line_bot_api.reply_message(token,line_element)

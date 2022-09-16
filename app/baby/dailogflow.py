@@ -1,31 +1,38 @@
 from baby.element_map import ParseConfig
 from baby.actions import action_factory
+
+from baby.db_utils import get_sitter_baby
+
 class DailogController:
     def __init__(self):
         self.cache={}
-        self.follow_up_list = []
     
     def get_last_msg(self,user_id:str):
         return self.cache.get(user_id) or ''
 
     def process(self,message:str,user_id:str):
         #check if follow up exists and concate last msg
-        if user_id in self.follow_up_list:
+        if user_id in self.cache:
             last_message = self.get_last_msg(user_id)
             message = last_message+message
-        
         #parse message get action and request data
         action_type,request_types,request_data,request_time = self.parse_msg(message)
 
-        action = action_factory(action_type,request_types,request_data,request_time)
+        action = action_factory(action_type)
+        sitter,baby = get_sitter_baby(user_id)
+        return_data= action.execute(
+            baby,
+            sitter,
+            request_types,
+            request_data,
+            request_time
+        )
 
-        return_data,follow_up = action.execute()
-
-        if follow_up:
-            self.follow_up_list.append(user_id)
+        if return_data['follow_up']:
+            self.cache[user_id]=message
         else:
-            if user_id in self.follow_up_list:
-                self.follow_up_list.pop(self.follow_up_list.index(user_id))
+            if user_id in self.cache:
+                del self.cache[user_id]
 
         #format return data
         return return_data
@@ -38,9 +45,12 @@ class MessageParser:
 
     @classmethod
     def parse_action(cls,message:str):
-
         if ParseConfig['action_parser'] in message:
-            action_type,request_content = message.split(ParseConfig['action_parser'])
+            try:
+                action_type,request_content = message.split(ParseConfig['action_parser'])
+            except:
+                action_type='Menu'
+                request_content='All'
         else:
             action_type='Menu'
             request_content='All'

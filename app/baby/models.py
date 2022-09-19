@@ -35,9 +35,9 @@ class Daiper(models.Model):
     change_type = models.CharField(max_length=200)
     def format_log_str(self):
         time_format = '%H:%M'
-        if self.change_type=='1':
+        if self.change_type in ['1','Daiper1']:
             change_type='小便'
-        else:
+        elif self.change_type in ['2','Daiper2']:
             change_type='大便'
         return f"{datetime.datetime.fromtimestamp(self.time_stamp).strftime(time_format)} :{change_type}\n"
 

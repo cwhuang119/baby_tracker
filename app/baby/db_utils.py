@@ -3,6 +3,7 @@
 import datetime
 import time
 
+from baby.models import BabyCustoms
 from baby.models import BabyInfo
 from baby.models import BabySitterInfo
 from baby.models import Daiper,Weight,HeadLength,Height,Feed,Temperature
@@ -106,3 +107,72 @@ def log_HeadLength(baby,sitter,time_stamp,value):
     )
     head_length.save()
     return head_length is not None
+
+
+def set_babycustoms(baby,sitter,request_type,request_data):
+    baby_customs = BabyCustoms.objects.filter(baby=baby)
+    if len(baby_customs)>0:
+        if request_type =='Birthday':
+            birthday = datetime.datetime.strftime(datetime.datetime.strptime(request_data,'%Y%m%d'),'%Y-%m-%d')
+            baby_info = BabyInfo.objects.filter(name=baby.name)
+            baby_info.update(birthday=birthday)
+        elif request_type=='FeedInterval':
+            baby_customs.update(feed_interval=int(request_data))
+        elif request_type=='FeedFrequency':
+            baby_customs.update(feed_frequency=int(request_data))
+        elif request_type=='Gender':
+            if request_data=='男':
+                gender='boy'
+                # gender=True
+            else:
+                gender='girl'
+                # gender=False
+        return True
+    else:
+        baby_info = BabyInfo.objects.filter(name=baby.name)
+        baby_info.update(gender=gender)
+        birthday,feed_interval,feed_frequency,gender=None,None,None,None
+        if request_data =='Birthday':
+            birthday = datetime.datetime.strftime(datetime.datetime.strptime(request_data,'%Y%m%d'),'%Y-%m-%d')
+            baby_info = BabyInfo.objects.filter(name=baby.name)
+            baby_info.update(birthday=birthday)
+        elif request_data=='FeedInterval':
+            feed_interval=int(request_data)
+        elif request_data=='FeedFrequency':
+            feed_frequency=int(request_data)
+        elif request_data=='Gender':
+            if request_data=='男':
+                gender='boy'
+                # gender=True
+            else:
+                gender='girl'
+                # gender=False
+            baby_info = BabyInfo.objects.filter(name=baby.name)
+            baby_info.update(gender=gender)
+        baby_customs = BabyCustoms(
+            baby=baby,
+            feed_interval=feed_interval,
+            feed_frequency=feed_frequency,
+        )
+        baby_customs.save()
+        return True
+
+
+def get_baby_customs(baby):
+    baby_customs = BabyCustoms.objects.filter(baby=baby)
+    if len(baby_customs)>0:
+        return baby_customs[0]
+    else:
+        return None
+
+
+def get_last_weight(baby):
+    baby_weights = Weight.objects.filter(baby=baby).order_by('-time_stamp')
+    if len(baby_weights)>0:
+        return baby_weights[0]
+
+def get_last_feed(baby):
+    feeds = Feed.objects.filter(baby=baby).order_by('-time_stamp')
+
+    if len(feeds)>0:
+        return feeds[0]

@@ -201,17 +201,17 @@ PERIOD_BTN = {
 SUGGESTIONS_BTN = {
     "NextFeed":{
         "label":"下次進食時間",
-        "text":"Suggestions!!NextFeed##",
+        "text":"Suggestions!!NextFeed",
         "data":"A&下次進食時間"
     },
     "FeedVolume":{
         "label":"建議奶量",
-        "text":"Suggestions!!FeedVolume##",
+        "text":"Suggestions!!FeedVolume",
         "data":"A&建議奶量"
     },
     "SleepingTime":{
         "label":"建議睡眠時數",
-        "text":"Suggestions!!SleepingTime##",
+        "text":"Suggestions!!SleepingTime",
         "data":"A&建議睡眠時數"
     },
 }

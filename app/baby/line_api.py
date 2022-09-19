@@ -17,7 +17,6 @@ class LineBot:
             return HttpResponseBadRequest()
         contents = []
         for event in events:
-            print(event,type(event))
             content = self.event_handler(event)
             if content!=None:
                 contents.append(content)
@@ -39,11 +38,15 @@ class LineBot:
     
     def reply_message(self,token,data):
         line_element = build_line_element(data)
-        self.line_bot_api.reply_message(token,line_element)
-
+        try:
+            self.line_bot_api.reply_message(token,line_element)
+        except Exception as e:
+            print(f"Failed to reply message:{str(e)}")
     def push_message(self,user_id,data):
         line_element = build_line_element(data)
-        self.line_bot_api.push_message(user_id,line_element)
-
+        try:
+            self.line_bot_api.push_message(user_id,line_element)
+        except Exception as e:
+            print(f"Failed to push message:{str(e)}")
 
         

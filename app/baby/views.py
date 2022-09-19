@@ -5,14 +5,13 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 
-from baby.dialog import message_parsing
 
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-from baby.states import linebot,reminder,dailog_controller
+from baby.states import linebot,dailog_controller
 
 @csrf_exempt
 def callback(request):

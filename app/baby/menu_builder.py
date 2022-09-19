@@ -7,6 +7,8 @@ from baby.element_map import REMINDER_BTN
 from baby.element_map import QUERY_ALL_BTN
 from baby.element_map import QUERY_SUM_BTN
 from baby.element_map import LOG_BTN
+from baby.element_map import PERIOD_BTN
+from baby.element_map import LOGHISTORY_BTN
 
 def build_menu(request_types):
     request_type=request_types[0]
@@ -55,7 +57,6 @@ def build_menu(request_types):
             "title":"功能選單",
             "text":"請選擇",
             "actions_data":[
-                MENU_BTN['ReminderType'],
                 MENU_BTN['BabyCustoms'],
             ]
         }
@@ -108,6 +109,53 @@ def build_menu(request_types):
                 LOG_BTN['Daiper1'],
                 LOG_BTN['Daiper2'],
                 MENU_BTN['LogOther'],
+            ]
+        }
+    elif request_type=='LogOther':
+                menu_content = {
+            "title":"功能選單",
+            "text":"請選擇",
+            "actions_data":[
+                LOG_BTN['Weight'],
+                LOG_BTN['Height'],
+                LOG_BTN['Temperature'],
+                LOG_BTN['HeadLength'],
+            ]
+        }
+    
+    elif request_type=='LogHistory':
+        menu_content = {
+            "title":"功能選單",
+            "text":"請選擇",
+            "actions_data":[
+                LOGHISTORY_BTN['Feed'],
+                LOGHISTORY_BTN['Daiper1'],
+                LOGHISTORY_BTN['Daiper2'],
+                MENU_BTN['LogHistoryOther'],
+            ]
+        }
+
+    elif request_type=='LogHistoryOther':
+                menu_content = {
+            "title":"功能選單",
+            "text":"請選擇",
+            "actions_data":[
+                LOGHISTORY_BTN['Weight'],
+                LOGHISTORY_BTN['Height'],
+                LOGHISTORY_BTN['Temperature'],
+                LOGHISTORY_BTN['HeadLength'],
+            ]
+        }
+
+    elif request_type=='SelectPeriod':
+        menu_content = {
+            "title":"選擇日期",
+            "text":"請選擇",
+            "actions_data":[
+                PERIOD_BTN['1'],
+                PERIOD_BTN['7'],
+                PERIOD_BTN['30'],
+                PERIOD_BTN['90'],
 
             ]
         }

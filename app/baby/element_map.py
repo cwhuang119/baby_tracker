@@ -110,6 +110,44 @@ LOG_BTN = {
 }
 
 
+LOGHISTORY_BTN = {
+    "Feed":{
+        "label":"餵奶",
+        "text":"LogHistory!!Feed**",
+        "data":"A&餵奶"
+    },
+    "Daiper1":{
+        "label":"小便",
+        "text":"LogHistory!!Daiper**1",
+        "data":"A&小便"
+    },
+    "Daiper2":{
+        "label":"大便",
+        "text":"LogHistory!!Daiper**2",
+        "data":"A&大便"
+    },
+    "Weight":{
+        "label":"體重",
+        "text":"LogHistory!!Weight**",
+        "data":"A&體重"
+    },
+    "Height":{
+        "label":"身高",
+        "text":"LogHistory!!Height**",
+        "data":"A&身高"
+    },
+    "Temperature":{
+        "label":"體溫",
+        "text":"LogHistory!!Temperature**",
+        "data":"A&體溫"
+    },
+    "HeadLength":{
+        "label":"頭圍",
+        "text":"LogHistory!!HeadLength**",
+        "data":"A&頭圍"
+    }
+}
+
 QUERY_ALL_BTN = {
     "Feed&Daiper":{
         "label":"進食與尿布",
@@ -137,7 +175,7 @@ QUERY_SUM_BTN = {
     }
 }
 
-DAYS_BTN = {
+PERIOD_BTN = {
     "1":{
         "label":"今日",
         "text":"1",

@@ -33,6 +33,13 @@ class Daiper(models.Model):
     time_stamp = models.IntegerField()
     image = models.CharField(max_length=200)
     change_type = models.CharField(max_length=200)
+    def format_log_str(self):
+        time_format = '%H:%M'
+        if self.change_type=='1':
+            change_type='小便'
+        else:
+            change_type='大便'
+        return f"{datetime.datetime.fromtimestamp(self.time_stamp).strftime(time_format)} :{change_type}\n"
 
 
 class Feed(models.Model):
@@ -41,7 +48,9 @@ class Feed(models.Model):
     time_stamp = models.IntegerField()
     volume = models.FloatField()
     image = models.CharField(max_length=200)
-
+    def format_log_str(self):
+        time_format = '%H:%M'
+        return f"{datetime.datetime.fromtimestamp(self.time_stamp).strftime(time_format)} :{int(self.volume)} ml\n"
 class Weight(models.Model):
     baby = models.ForeignKey(BabyInfo, on_delete=models.CASCADE)
     sitter = models.ForeignKey(BabySitterInfo, on_delete=models.CASCADE)
@@ -49,6 +58,9 @@ class Weight(models.Model):
     weight = models.FloatField()
     image = models.CharField(max_length=200)
 
+    def format_log_str(self):
+        time_format = '%H:%M'
+        return f"{datetime.datetime.fromtimestamp(self.time_stamp).strftime(time_format)} :{int(self.weight)} g\n"
 class Height(models.Model):
     baby = models.ForeignKey(BabyInfo, on_delete=models.CASCADE)
     sitter = models.ForeignKey(BabySitterInfo, on_delete=models.CASCADE)
@@ -56,6 +68,9 @@ class Height(models.Model):
     height = models.FloatField()
     image = models.CharField(max_length=200)
 
+    def format_log_str(self):
+        time_format = '%H:%M'
+        return f"{datetime.datetime.fromtimestamp(self.time_stamp).strftime(time_format)} :{int(self.height)} cm\n"
 class HeadLength(models.Model):
     baby = models.ForeignKey(BabyInfo, on_delete=models.CASCADE)
     sitter = models.ForeignKey(BabySitterInfo, on_delete=models.CASCADE)
@@ -63,7 +78,9 @@ class HeadLength(models.Model):
     head_length = models.FloatField()
     image = models.CharField(max_length=200)
 
-
+    def format_log_str(self):
+        time_format = '%H:%M'
+        return f"{datetime.datetime.fromtimestamp(self.time_stamp).strftime(time_format)} :{int(self.head_length)} cm\n"
 
 class Temperature(models.Model):
     baby = models.ForeignKey(BabyInfo, on_delete=models.CASCADE)
@@ -71,3 +88,7 @@ class Temperature(models.Model):
     time_stamp = models.IntegerField()
     temperature = models.FloatField()
     image = models.CharField(max_length=200)
+
+    def format_log_str(self):
+        time_format = '%H:%M'
+        return f"{datetime.datetime.fromtimestamp(self.time_stamp).strftime(time_format)} :{self.temperature}度\n"

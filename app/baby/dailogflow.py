@@ -1,3 +1,4 @@
+from email import message
 from baby.element_map import ParseConfig
 from baby.actions import action_factory
 
@@ -9,12 +10,21 @@ class DailogController:
     
     def get_last_msg(self,user_id:str):
         return self.cache.get(user_id) or ''
-
+    def clear_user_cache(self,user_id:str):
+        if user_id in self.cache:
+            del self.cache[user_id]
+    def concate_last_msg(self,user_id:str,message:str):
+        if user_id in self.cache:
+            last_msg = self.get_last_msg(user_id)
+            return last_msg+message
+        else:
+            return message
     def process(self,message:str,user_id:str):
         #check if follow up exists and concate last msg
-        if user_id in self.cache:
-            last_message = self.get_last_msg(user_id)
-            message = last_message+message
+        message = self.concate_last_msg(user_id,message)
+
+        print(message)
+
         #parse message get action and request data
         action_type,request_types,request_data,request_time = self.parse_msg(message)
 
@@ -29,12 +39,10 @@ class DailogController:
         )
 
         if return_data['follow_up']:
-            self.cache[user_id]=message
+            self.cache[user_id]=message+return_data['follow_up_parser']
         else:
-            if user_id in self.cache:
-                del self.cache[user_id]
+            self.clear_user_cache(user_id)
 
-        #format return data
         return return_data
 
     def parse_msg(self,message:str):
@@ -45,6 +53,7 @@ class MessageParser:
 
     @classmethod
     def parse_action(cls,message:str):
+
         if ParseConfig['action_parser'] in message:
             try:
                 action_type,request_content = message.split(ParseConfig['action_parser'])

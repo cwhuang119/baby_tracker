@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from baby.dailogflow import MessageParser,DailogController
 
-from baby.models import BabyInfo,BabySitterInfo,Feed
+from baby.models import BabyInfo,BabySitterInfo,Daiper
 
 class DailogFlowTestCase(TestCase):
 
@@ -13,19 +13,26 @@ class DailogFlowTestCase(TestCase):
             BabyInfo.objects.create(name='baby')
             baby = BabyInfo.objects.get(name='baby')
             BabySitterInfo.objects.create(name='test',user_id=self.user_id,baby=baby)
-        self.log_message = ['123123123','Menu!!LogType','Menu!!Log','Log11Feed**','100']
-        self.check_log = ['123123123','Menu!!QueryType','QueryAll!!Feed**','1']
+        self.log_message_Feed = ['123123123','Menu!!LogType','Menu!!Log','Log!!Feed**','100']
+        self.check_log_Feed = ['123123123','Menu!!QueryType','QueryAll!!Feed**','1']
+
+        self.log_message_Daiper1 = ['123123123','Menu!!LogType','Menu!!Log','Log!!Daiper**1']
+        self.check_log_Daiper1 = ['123123123','Menu!!QueryType','QueryAll!!Daiper**','1']
+
+        self.log_message_Daiper2 = ['123123123','Menu!!LogType','Menu!!Log','Log!!Daiper**2']
+        self.check_log_Daiper2 = ['123123123','Menu!!QueryType','QueryAll!!Daiper**','1']
+
     def test_cache(self):
 
         dailog_controller = DailogController()
         msg1 = 'Test!!test'
         return_data = dailog_controller.process(msg1,self.user_id)
-        self.assertEqual(return_data,{'type': 'text', 'content': 'test', 'follow_up': True})
+        self.assertEqual(return_data,{'type': 'text', 'content': 'test', 'follow_up': True,'follow_up_parser':''})
         self.assertEqual(msg1,dailog_controller.get_last_msg(self.user_id))
 
         msg2='123123'
         return_data = dailog_controller.process(msg2,self.user_id)
-        self.assertEqual(return_data,{'type': 'text', 'content': 'test', 'follow_up': True})
+        self.assertEqual(return_data,{'type': 'text', 'content': 'test', 'follow_up': True,'follow_up_parser':''})
         self.assertEqual(msg1+msg2,dailog_controller.get_last_msg(self.user_id))
 
         msg3 = 'Test!!123123'
@@ -33,13 +40,38 @@ class DailogFlowTestCase(TestCase):
         self.assertEqual(return_data['type'],'button')
         self.assertEqual('',dailog_controller.get_last_msg(self.user_id))
 
-    def test_log_flow(self):
+    def test_log_flow_Feed(self):
         dailog_controller = DailogController()
-        for msg in self.log_message:
+        #test log flow
+        for msg in self.log_message_Feed:
             return_data = dailog_controller.process(msg,self.user_id)
-        for msg in self.check_log:
+        #get detail log
+        for msg in self.check_log_Feed:
             return_data = dailog_controller.process(msg,self.user_id)
+        #check log success and can be found in detail logs
+        self.assertEqual(True,'100 ml' in return_data['content'])
 
+    def test_log_flow_Daiper1(self):
+        dailog_controller = DailogController()
+        #test log flow
+        for msg in self.log_message_Daiper1:
+            return_data = dailog_controller.process(msg,self.user_id)
+        #get detail log
+        for msg in self.check_log_Daiper1:
+            return_data = dailog_controller.process(msg,self.user_id)
+        #check log success and can be found in detail logs
+        self.assertEqual(True,'小便' in return_data['content'])
+
+    def test_log_flow_Daiper2(self):
+        dailog_controller = DailogController()
+        #test log flow
+        for msg in self.log_message_Daiper2:
+            return_data = dailog_controller.process(msg,self.user_id)
+        #get detail log
+        for msg in self.check_log_Daiper2:
+            return_data = dailog_controller.process(msg,self.user_id)
+        #check log success and can be found in detail logs
+        self.assertEqual(True,'大便' in return_data['content'])
 
 
 class MessageParserTestCase(TestCase):

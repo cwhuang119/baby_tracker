@@ -44,3 +44,6 @@ class LineBot:
     def push_message(self,user_id,data):
         line_element = build_line_element(data)
         self.line_bot_api.push_message(user_id,line_element)
+
+
+        

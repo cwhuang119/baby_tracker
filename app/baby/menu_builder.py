@@ -10,6 +10,15 @@ from baby.element_map import LOG_BTN
 from baby.element_map import PERIOD_BTN
 from baby.element_map import LOGHISTORY_BTN
 
+
+def custon_btn(title='',text='',action_data=[]):
+    return {
+        'title':title,
+        'text':text,
+        'action_data':action_data
+    }
+
+
 def build_menu(request_types):
     request_type=request_types[0]
     if request_type=='All':

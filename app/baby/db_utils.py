@@ -25,7 +25,7 @@ def get_sitter_baby(user_id):
     if sitter !=None:
         return sitter,sitter.baby
     else:
-        raise KeyError(f"User ID not found:{user_id}")
+        return None,None
 
 def query_log(baby,query_types,period):
     period = int(period)*-1
@@ -176,3 +176,17 @@ def get_last_feed(baby):
 
     if len(feeds)>0:
         return feeds[0]
+
+
+def register_baby(baby_name):
+    b = BabyInfo(name=baby_name)
+    b.save()
+    return b
+
+def register_sitter(user_id,sitter_name,baby):
+    baby_sitter_info = BabySitterInfo(
+        user_id=user_id,
+        name=sitter_name,
+        baby=baby
+    )
+    baby_sitter_info.save()

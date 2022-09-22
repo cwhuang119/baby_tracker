@@ -35,7 +35,8 @@ class DailogController:
             sitter,
             request_types,
             request_data,
-            request_time
+            request_time,
+            user_id
         )
 
         if return_data['follow_up']:

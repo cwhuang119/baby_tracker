@@ -99,7 +99,25 @@ def gen_line_ask_time():
 def gen_line_log_failed():
     return "登記失敗，請重新操作！"
 
-def gen_lines_Log(baby,sitter,request_type,request_data,follow_up):
+def gen_lines_Log(baby,sitter,request_type,request_data,follow_up,other_params={}):
+
+
+    def gen_feed_options(last_feed):
+        last_feed_volume = last_feed.volume
+        volumes = [last_feed_volume-20,last_feed_volume-10,last_feed_volume,last_feed_volume+10]
+        actions_data = []
+        for volume in volumes:
+            volume = int(volume)
+            actions_data.append({
+                "label":f"{volume} ml",
+                "text":f"{volume}",
+                "data":f"{volume} ml"
+            })
+        return {
+            "title":'請選擇奶量',
+            "text":'若沒有合適奶量可直接輸入',
+            "actions_data":actions_data
+        }
 
     follow_up_lines = {
         "Feed":"請輸入奶量(ml)",
@@ -119,7 +137,10 @@ def gen_lines_Log(baby,sitter,request_type,request_data,follow_up):
 
     # gen follow up lines
     if follow_up:
-        return follow_up_lines[request_type]
+        last_feed = other_params.get('last_feed')
+        if request_type=='Feed' and last_feed is not None:
+            return gen_feed_options(last_feed),'button'
+        return follow_up_lines[request_type],'text'
     #gen success lines
     else:
         baby_name = baby.name
@@ -133,7 +154,7 @@ def gen_lines_Log(baby,sitter,request_type,request_data,follow_up):
             msg+=f"{change_type}一次"
         else:
             msg+=f"{success_lines[request_type][0]}{request_data}{success_lines[request_type][1]}"
-        return msg
+        return msg,'text'
 
 
 def gen_lines_babycustoms(baby,sitter,request_type,request_data,follow_up):

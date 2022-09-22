@@ -3,7 +3,7 @@ from abc import abstractclassmethod
 import time
 import datetime
 
-from baby.db_utils import set_babycustoms,get_baby_customs
+from baby.db_utils import set_babycustoms,get_baby_customs,register_baby,register_sitter
 from baby.db_utils import log_data,query_log,get_last_weight,get_last_feed
 from baby.format_return_data import format_query_all_content,format_query_sum_content,gen_lines_babycustoms
 from baby.format_return_data import gen_lines_Log,gen_line_ask_time,gen_line_log_failed,gen_lines_suggestions
@@ -16,7 +16,7 @@ def action_factory(action_type):
         return ErrorAction()
 
 class Action:
-
+    
     def gen_return_data(self,content_type,content,follow_up,follow_up_parser=''):
         return {
             'type':content_type,
@@ -25,8 +25,25 @@ class Action:
             'follow_up_parser':follow_up_parser
         }
 
+    def verify_user(self,baby,sitter):
+        if baby is not None and sitter is not None:
+            return True
+        return False
+
+
+    def execute(self,baby,sitter,request_types,request_data,request_time,user_id):
+        """
+        return_data:
+            type:text/btn
+            content:
+        
+        """
+        if self.verify_user(baby,sitter):
+            return self._execute(baby,sitter,request_types,request_data,request_time)
+        return self.gen_return_data('text',"尚未註冊",follow_up=False)
+
     @abstractclassmethod
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time,user_id):
         """
         return_data:
             type:text/btn
@@ -45,22 +62,22 @@ class Action:
         return time.mktime(datetime.datetime.strptime(time_str,time_format).timetuple())
 
 class ErrorAction(Action):
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         return self.gen_return_data('text','Invalid Action',False)
 
 class TestAction(Action):
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         
         return self.gen_return_data('text','test',True)
 class Test2Action(Action):
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         
         return self.gen_return_data('text','test2',False)
 
 
 class MenuAction(Action):
 
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         follow_up=False
         menu = build_menu(request_types)
         return self.gen_return_data('button',menu,follow_up)
@@ -69,30 +86,34 @@ class MenuAction(Action):
 
 class LogAction(Action):
 
-    def execute(self,baby,sitter,request_types,request_data,request_time):
-
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
+        content_type = 'text'
         request_type = request_types[0]
         if request_data == '':
             follow_up = True
-            content = gen_lines_Log(baby,sitter,request_type,request_data,follow_up)
+            last_feed = get_last_feed(baby)
+            other_params = {
+                'last_feed':last_feed
+            }
+            content,content_type = gen_lines_Log(baby,sitter,request_type,request_data,follow_up,other_params)
         else:
             follow_up = False
             request_time = self.get_current_timestamp()
             try:
                 success = log_data(baby,sitter,request_types[0],request_time,request_data)
                 if success:
-                    content = gen_lines_Log(baby,sitter,request_type,request_data,follow_up)
+                    content,content_type = gen_lines_Log(baby,sitter,request_type,request_data,follow_up)
                 else:
                     content = gen_line_log_failed()
             except:
                 content = gen_line_log_failed()
 
-        return self.gen_return_data('text',content,follow_up)
+        return self.gen_return_data(content_type,content,follow_up)
 
 
 class LogHistoryAction(Action):
 
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         request_type = request_types[0]
         if request_data=='':
             follow_up = True
@@ -118,7 +139,7 @@ class LogHistoryAction(Action):
 
 class QueryAllAction(Action):
 
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         if request_data=='':
             follow_up = True
             content = build_menu(['SelectPeriod'])
@@ -134,7 +155,7 @@ class QueryAllAction(Action):
 
 
 class QuerySumAction(Action):
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         if request_data=='':
             follow_up = True
             content = build_menu(['SelectPeriod'])
@@ -147,7 +168,7 @@ class QuerySumAction(Action):
         return self.gen_return_data(content_type,content,follow_up)
 
 class BabyCustomsAction(Action):
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         request_type = request_types[0]
         if request_data=='':
             follow_up = True
@@ -162,7 +183,7 @@ class BabyCustomsAction(Action):
 
 
 class SuggestionsAction(Action):
-    def execute(self,baby,sitter,request_types,request_data,request_time):
+    def _execute(self,baby,sitter,request_types,request_data,request_time):
         request_type = request_types[0]
         follow_up = False
         content_type = 'text'
@@ -177,6 +198,22 @@ class SuggestionsAction(Action):
             last_feed=last_feed,
             last_weight=last_weight
             )
-
-
         return self.gen_return_data(content_type,content,follow_up)
+
+
+class AdminAction(Action):
+
+    # Admin!!Register**sitter_name-baby
+
+    def execute(self,baby,sitter,request_types,request_data,request_time,user_id):
+
+        request_type = request_types[0]
+        if request_type=='Register':
+            sitter_name,baby_name = request_data.split('-')
+            if baby==None:
+                baby = register_baby(baby_name)
+                register_sitter(user_id=user_id,sitter_name=sitter_name,baby=baby)
+                content = '註冊成功'
+                content_type = 'text'
+
+        return self.gen_return_data(content_type,content,follow_up=False)

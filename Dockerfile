@@ -3,7 +3,7 @@ FROM python:3.9-alpine
 WORKDIR /workspace
 ADD app /workspace
 #RUN apt update
-RUN rm -r /workspace/db
+#RUN rm -r /workspace/db
 #RUN rm -r /workspace/baby/migrations
 #ENV DEBIAN_FRONTEND noninteractive
 #RUN apt install python3-pip -y

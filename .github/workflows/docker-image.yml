@@ -30,4 +30,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: rejectsgallery/baby_tracker:$(date +%s)
+          tags: rejectsgallery/baby_tracker:test

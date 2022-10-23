@@ -2,9 +2,8 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - '[0-9].[0-9]'
 
 jobs:
 
@@ -30,4 +29,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: rejectsgallery/baby_tracker:test
+          tags: rejectsgallery/baby_tracker:${{ steps.docker_meta.outputs.tags }}

@@ -28,5 +28,6 @@ jobs:
         name: Build & Push
         uses: docker/build-push-action@v3
         with:
+          context: .
           push: true
           tags: rejectsgallery/baby_tracker:${{ steps.docker_meta.outputs.tags }}

@@ -1,6 +1,8 @@
 
 
 # Baby Tracker
+![Docker Version](https://img.shields.io/docker/v/rejectsgallery/baby_tracker)
+[![Test](https://github.com/cwhuang119/baby_tracker/actions/workflows/docker-image.yml/badge.svg)](https://github.com/cwhuang119/baby_tracker/actions)
 ## Line Bot for baby activity tracking
 
 ## Features

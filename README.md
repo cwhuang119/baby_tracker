@@ -32,3 +32,12 @@ Since Line bot message API only accept https, so you need to use ngork to router
 5. Check Actions Status
 6. Generate Return Message
 7. Build Line Object
+
+
+## shortcuts
+A - 登記喝奶:Log!!Feed**
+B - 今日進食與尿布:QueryAll!!Feed&Daiper**1
+C - 登記:Menu!!Log
+D - 下次餵奶時間:Suggestions!!NextFeed
+E - 查詢詳細資料:Menu!!QueryTypeAll
+F - 選單:GEN

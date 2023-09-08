@@ -179,9 +179,14 @@ def get_last_feed(baby):
 
 
 def register_baby(baby_name):
-    b = BabyInfo(name=baby_name)
-    b.save()
-    return b
+    # check if baby exists
+    baby_info = BabyInfo.objects.filter(name=baby_name)
+    if len(baby_info)>0:
+        return baby_info[0]
+    else:
+        b = BabyInfo(name=baby_name)
+        b.save()
+        return b
 
 def register_sitter(user_id,sitter_name,baby):
     baby_sitter_info = BabySitterInfo(
